@@ -1,16 +1,12 @@
-# active_gauges
+# AG Gauges 
 
-A new Flutter project.
+A new Flutter project that is still in the works.
 
-## Getting Started
+## Goals
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Design a UI using LGVL to illustrate a the current "roll" angle of vehicle, Target: Motorcycle
+- Using a dev board with a LED screen, produce an Active Gauge
+- Collect data [Roll Angle, Lateral G-Force, Longitudal G-Force]
+- Update Gauge UI in Real Time
+- Use BLE to connect to a mobile device and transmit data for storage and later review
+- Customize gauge UI from the mobile app
