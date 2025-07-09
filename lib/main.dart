@@ -1,8 +1,19 @@
+import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+import 'package:active_gauges/models/ride_models.dart';
 import 'package:active_gauges/splash_screen.dart';
 import 'package:active_gauges/themes/main_theme.dart';
-import 'package:flutter/material.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(RideDataPointAdapter());
+  Hive.registerAdapter(SingleRideAdapter());
+
+  await Hive.openBox<SingleRide>('rides');
+
   runApp(const MyApp());
 }
 
