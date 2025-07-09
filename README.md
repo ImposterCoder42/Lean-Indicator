@@ -1,6 +1,7 @@
-<p align="center">
-  <img src="assets/images/app_icon-2.1.png" alt="Active Gauges Logo" width="250" style="border-radius: 15px;"/>
-</p>  
+<p>
+  <img src="assets/images/app_icon-2.1.png" alt="Active Gauges Logo" width="200" style="border-radius: 15px;"/>
+</p>
+
 # 🏍️ AG Gauges  
 
 **AG Gauges** is an ambitious Flutter-powered project designed for riders and drivers who crave real-time data and sleek visuals.  
