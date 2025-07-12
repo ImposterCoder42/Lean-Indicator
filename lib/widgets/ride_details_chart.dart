@@ -1,9 +1,9 @@
-import 'package:active_gauges/models/ride_models.dart';
-import 'package:active_gauges/utils/chart_utils.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:active_gauges/utils/chart_utils.dart';
+import 'package:active_gauges/models/ride_models.dart';
 import 'package:active_gauges/providers/ride_provider.dart';
 
 class RideDetailsChart extends ConsumerStatefulWidget {
@@ -41,7 +41,7 @@ class _RideDetailsChartState extends ConsumerState<RideDetailsChart> {
       final maxScroll = _scrollController.position.maxScrollExtent;
       final currentScroll = _scrollController.position.pixels;
 
-      // 🔽 Scroll Down - Load Next Batch
+      // Load Next Batch
       if (currentScroll >= maxScroll - 100) {
         int nextStartIdx = currentStartIdx + batchSize;
         if (nextStartIdx < ride!.rideData.length) {
@@ -50,7 +50,6 @@ class _RideDetailsChartState extends ConsumerState<RideDetailsChart> {
             _getSelectedRideData(currentStartIdx, batchSize);
           });
         } else if (currentStartIdx < ride!.rideData.length - 1) {
-          // Catch final batch if smaller than batchSize
           setState(() {
             currentStartIdx = ride!.rideData.length - batchSize;
             if (currentStartIdx < 0) currentStartIdx = 0;
@@ -58,8 +57,7 @@ class _RideDetailsChartState extends ConsumerState<RideDetailsChart> {
           });
         }
       }
-
-      // 🔼 Scroll Up - Load Previous Batch
+      // Load Previous Batch
       if (currentScroll <= 100 && currentStartIdx > 0) {
         int prevStartIdx = currentStartIdx - batchSize;
         if (prevStartIdx < 0) prevStartIdx = 0;
@@ -103,9 +101,7 @@ class _RideDetailsChartState extends ConsumerState<RideDetailsChart> {
           padding: const EdgeInsets.all(.8),
           child: SizedBox(
             height: 300,
-            width: angleLineData.isEmpty
-                ? 250
-                : angleLineData.length.toDouble() * 20,
+            width: angleLineData.length.toDouble() * 20,
             child: Stack(
               clipBehavior: Clip.none,
               children: [

@@ -1,10 +1,9 @@
-import 'package:active_gauges/screens/ride_details_page.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// import 'package:active_gauges/models/ride_models.dart';
 import 'package:active_gauges/providers/ride_provider.dart';
+import 'package:active_gauges/screens/ride_details_page.dart';
 import 'package:active_gauges/themes/shared_decorations.dart';
 
 class RideHistoryPage extends ConsumerWidget {

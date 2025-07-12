@@ -1,12 +1,12 @@
-import 'package:active_gauges/models/ride_models.dart';
-import 'package:active_gauges/utils/chart_utils.dart';
-import 'package:active_gauges/widgets/ride_details_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:active_gauges/utils/chart_utils.dart';
+import 'package:active_gauges/models/ride_models.dart';
 import 'package:active_gauges/providers/ride_provider.dart';
 import 'package:active_gauges/themes/shared_decorations.dart';
+import 'package:active_gauges/widgets/ride_details_chart.dart';
 
 class RideDetailsPage extends ConsumerStatefulWidget {
   const RideDetailsPage({super.key, required this.rideIdx});
@@ -36,7 +36,7 @@ class _RideDetailsPageState extends ConsumerState<RideDetailsPage> {
         body: ListView(
           children: [
             Text(
-              "ride date: ${DateFormat.yMMMMd().format(ride!.date).toLowerCase()}",
+              "RIDE DATE: ${DateFormat.yMMMMd().format(ride!.date).toUpperCase()}",
             ),
             RideDetailsChart(rideIdx: widget.rideIdx),
             Row(
@@ -44,12 +44,12 @@ class _RideDetailsPageState extends ConsumerState<RideDetailsPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "speed",
+                  "angle",
                   style: TextStyle(fontSize: 28, color: linePrimaryColor),
                 ),
                 Text(" - ", style: TextStyle(fontSize: 28)),
                 Text(
-                  "angle",
+                  "speed",
                   style: TextStyle(fontSize: 28, color: lineSecondaryColor),
                 ),
               ],

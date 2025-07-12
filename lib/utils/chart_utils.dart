@@ -38,22 +38,23 @@ List<LineTooltipItem> buildRideTooltipItem(List<LineBarSpot> touchedSpots) {
     if (barIndex == 0) {
       // Lean angle line
       if (value > 0) {
-        label = 'right lean: ${value.toStringAsFixed(1)}°';
+        label = 'RIGHT LEAN: ${value.toStringAsFixed(1)}°';
       } else if (value < 0) {
-        label = 'left lean: ${value.abs().toStringAsFixed(1)}°';
+        label = 'LEFT LEAN: ${value.abs().toStringAsFixed(1)}°';
       } else {
-        label = 'upright';
+        label = 'UPRIGHT';
       }
     } else if (barIndex == 1) {
       // Speed line
-      label = 'speed: ${value.toStringAsFixed(1)} mph';
+      label =
+          'SPEED: ${value.toStringAsFixed(1)} MPH'; // need to make this dynamic
     } else {
       label = value.toStringAsFixed(1);
     }
 
     return LineTooltipItem(
       label,
-      const TextStyle(color: Colors.white, fontSize: 20),
+      const TextStyle(color: Colors.white, fontSize: 24),
     );
   }).toList();
 }

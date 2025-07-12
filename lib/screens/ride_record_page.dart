@@ -1,13 +1,13 @@
 import 'dart:async';
-import 'package:active_gauges/providers/ble_provider.dart';
-import 'package:active_gauges/screens/ride_history_page.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:active_gauges/models/ride_models.dart';
-import 'package:active_gauges/providers/ride_provider.dart';
 import 'package:active_gauges/providers/gps_provider.dart';
+import 'package:active_gauges/providers/ble_provider.dart';
+import 'package:active_gauges/providers/ride_provider.dart';
+import 'package:active_gauges/screens/ride_history_page.dart';
 import 'package:active_gauges/themes/shared_decorations.dart';
 
 class RideRecordPage extends ConsumerStatefulWidget {
@@ -19,6 +19,7 @@ class RideRecordPage extends ConsumerStatefulWidget {
 
 class _RideRecordPageState extends ConsumerState<RideRecordPage> {
   bool _isDesiredSpeedOutputMPH = true;
+  String _currentSpeedUnits = "mph";
   bool _isRecording = false;
   SingleRide? _newRide;
 
@@ -51,7 +52,7 @@ class _RideRecordPageState extends ConsumerState<RideRecordPage> {
 
   Future<void> _loadTitleDialogAndSave() async {
     String defaultTitle =
-        "Ride on ${DateFormat.yMMMd().add_jm().format(DateTime.now())}";
+        "ride on ${DateFormat.yMMMd().add_jm().format(DateTime.now()).toLowerCase()}";
     final rideName = await showRideNameDialog(context, defaultTitle);
     if (rideName == null) return; // user cancelled
     final upperTitle = rideName.toUpperCase();
@@ -114,6 +115,14 @@ class _RideRecordPageState extends ConsumerState<RideRecordPage> {
     });
   }
 
+  Widget _buildLeanLabel(double lean) {
+    String lable = "";
+    if (lean == 0) lable = "upright ${lean.abs()}°";
+    if (lean < 0) lable = "${lean.abs()}° right";
+    if (lean > 0) lable = "${lean.abs()}° left";
+    return Text(lable.toUpperCase());
+  }
+
   @override
   void dispose() {
     ref.read(gpsProvider.notifier).stopTracking();
@@ -151,25 +160,39 @@ class _RideRecordPageState extends ConsumerState<RideRecordPage> {
           child: ListView(
             children: [
               SizedBox(height: 30),
-              Text("units for speed:"),
+              Text("tracking in $_currentSpeedUnits"),
               ElevatedButton(
                 onPressed: () {
+                  setState(() {
+                    _isDesiredSpeedOutputMPH = !_isDesiredSpeedOutputMPH;
+                    _isDesiredSpeedOutputMPH
+                        ? _currentSpeedUnits = "mph"
+                        : _currentSpeedUnits = "kph";
+                  });
                   _isDesiredSpeedOutputMPH
-                      ? ref.read(gpsProvider.notifier).switchUnit('kph')
-                      : ref.read(gpsProvider.notifier).switchUnit('mph');
-                  _isDesiredSpeedOutputMPH = !_isDesiredSpeedOutputMPH;
+                      ? ref
+                            .read(gpsProvider.notifier)
+                            .switchUnit(_currentSpeedUnits)
+                      : ref
+                            .read(gpsProvider.notifier)
+                            .switchUnit(_currentSpeedUnits);
                 },
-                child: _isDesiredSpeedOutputMPH ? Text('KPH') : Text("MPH"),
+                child: _isDesiredSpeedOutputMPH
+                    ? Text("SWITCH TO KPH")
+                    : Text("SWITCH TO MPH"),
               ),
               ElevatedButton.icon(
                 icon: Icon(_isRecording ? Icons.save : Icons.timer),
                 onPressed: _isRecording ? _stopRecording : _startRecording,
-                label: Text(_isRecording ? 'save' : 'record'),
+                label: Text(_isRecording ? "save" : "record"),
               ),
               Column(
                 children: [
-                  if (_isRecording) Text("current angle: $lean"),
-                  if (_isRecording) Text("current speed: $bikeSpeed"),
+                  if (_isRecording && ble.isConnected) _buildLeanLabel(lean!),
+                  if (_isRecording)
+                    Text(
+                      "current speed: $bikeSpeed ${_currentSpeedUnits.toUpperCase()}",
+                    ),
                 ],
               ),
             ],
