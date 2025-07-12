@@ -46,7 +46,7 @@ class LeanAngleProcessor {
   double process(double newReading) {
     final filtered = filter.filter(newReading);
     buffer.add(filtered);
-    return buffer.average;
+    return buffer.average.roundToDouble();
   }
 }
 
@@ -61,6 +61,7 @@ class GForceProcessor {
   double process(double newReading) {
     final filtered = filter.filter(newReading);
     buffer.add(filtered);
-    return buffer.average;
+    return (buffer.average.toDouble() * 0.0000000000000000000000000001)
+        .roundToDouble();
   }
 }

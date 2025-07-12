@@ -19,23 +19,17 @@ class RideDataPointAdapter extends TypeAdapter<RideDataPoint> {
     return RideDataPoint(
       angle: fields[0] as double,
       speed: fields[1] as double,
-      gForceLat: fields[2] as double,
-      gForceLong: fields[3] as double,
     );
   }
 
   @override
   void write(BinaryWriter writer, RideDataPoint obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(2)
       ..writeByte(0)
       ..write(obj.angle)
       ..writeByte(1)
-      ..write(obj.speed)
-      ..writeByte(2)
-      ..write(obj.gForceLat)
-      ..writeByte(3)
-      ..write(obj.gForceLong);
+      ..write(obj.speed);
   }
 
   @override

@@ -1,3 +1,5 @@
+import 'package:active_gauges/screens/ride_details_page.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,8 +28,15 @@ class RideHistoryPage extends ConsumerWidget {
           itemBuilder: (context, index) {
             final ride = rides[index];
             return ListTile(
-              title: Text(ride.title),
-              subtitle: Text('${ride.rideData.length} data points'),
+              title: Text(DateFormat.yMMMMd().format(ride.date).toLowerCase()),
+              subtitle: Text(ride.title),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => RideDetailsPage(rideIdx: index),
+                  ),
+                );
+              },
             );
           },
         ),

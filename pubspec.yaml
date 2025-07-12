@@ -43,6 +43,7 @@ dependencies:
   permission_handler: ^11.0.1
   geolocator: ^14.0.1
   flutter_riverpod: ^2.5.1
+  fl_chart: ^1.0.0
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.4" 

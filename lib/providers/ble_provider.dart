@@ -13,30 +13,18 @@ class BleState {
   final BluetoothDevice? connectedDevice;
   final bool isConnected;
   final double? leanAngle;
-  final double? gLat;
-  final double? gLong;
 
-  BleState({
-    this.connectedDevice,
-    this.isConnected = false,
-    this.leanAngle,
-    this.gLat,
-    this.gLong,
-  });
+  BleState({this.connectedDevice, this.isConnected = false, this.leanAngle});
 
   BleState copyWith({
     BluetoothDevice? connectedDevice,
     bool? isConnected,
     double? leanAngle,
-    double? gLat,
-    double? gLong,
   }) {
     return BleState(
       connectedDevice: connectedDevice ?? this.connectedDevice,
       isConnected: isConnected ?? this.isConnected,
       leanAngle: leanAngle ?? this.leanAngle,
-      gLat: gLat ?? this.gLat,
-      gLong: gLong ?? this.gLong,
     );
   }
 }
@@ -44,8 +32,6 @@ class BleState {
 class BleController extends StateNotifier<BleState> {
   BleController() : super(BleState()) {
     _leanProcessor = LeanAngleProcessor();
-    _gLatProcessor = GForceProcessor();
-    _gLongProcessor = GForceProcessor();
   }
 
   final serviceUuid = Guid("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
@@ -55,8 +41,6 @@ class BleController extends StateNotifier<BleState> {
   StreamSubscription<BluetoothConnectionState>? _deviceStateSub;
 
   late LeanAngleProcessor _leanProcessor;
-  late GForceProcessor _gLatProcessor;
-  late GForceProcessor _gLongProcessor;
 
   Future<void> startScanAndConnect() async {
     FlutterBluePlus.scanResults.listen((results) async {
@@ -66,7 +50,7 @@ class BleController extends StateNotifier<BleState> {
           try {
             await result.device.connect();
             _deviceStateSub = result.device.connectionState.listen((state) {
-              state = state; // use this if needed for UI feedback
+              state = state;
             });
 
             state = state.copyWith(
@@ -101,21 +85,13 @@ class BleController extends StateNotifier<BleState> {
   }
 
   void _onDataReceived(List<int> value) {
-    if (value.length >= 10) {
+    if (value.length >= 2) {
       final byteData = ByteData.sublistView(Uint8List.fromList(value));
       final angle = byteData.getInt16(0, Endian.little);
-      final accX = byteData.getFloat32(2, Endian.little);
-      final accY = byteData.getFloat32(6, Endian.little);
-
+      print(angle);
       final cleanAngle = _leanProcessor.process(angle.toDouble());
-      final cleanLat = _gLatProcessor.process(accX);
-      final cleanLong = _gLongProcessor.process(accY);
-
-      state = state.copyWith(
-        leanAngle: cleanAngle,
-        gLat: cleanLat,
-        gLong: cleanLong,
-      );
+      if (!mounted) return;
+      state = state.copyWith(leanAngle: cleanAngle);
     }
   }
 

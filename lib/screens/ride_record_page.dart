@@ -3,11 +3,11 @@ import 'package:active_gauges/providers/ble_provider.dart';
 import 'package:active_gauges/screens/ride_history_page.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:active_gauges/models/ride_models.dart';
 import 'package:active_gauges/providers/ride_provider.dart';
+import 'package:active_gauges/providers/gps_provider.dart';
 import 'package:active_gauges/themes/shared_decorations.dart';
 
 class RideRecordPage extends ConsumerStatefulWidget {
@@ -18,12 +18,9 @@ class RideRecordPage extends ConsumerStatefulWidget {
 }
 
 class _RideRecordPageState extends ConsumerState<RideRecordPage> {
-  final String _desiredSpeedOutput = 'mph';
+  bool _isDesiredSpeedOutputMPH = true;
   bool _isRecording = false;
-  double _bikeSpeed = 0.0;
   SingleRide? _newRide;
-  // ignore: unused_field
-  StreamSubscription<Position>? _positionSubscription;
 
   @override
   void initState() {
@@ -32,28 +29,7 @@ class _RideRecordPageState extends ConsumerState<RideRecordPage> {
     if (ble.connectedDevice == null || !ble.isConnected) {
       ref.read(bleProvider.notifier).startScanAndConnect();
     }
-    _startSpeedTracking();
-  }
-
-  // ==============
-  // FOR BLE + GPS
-  // ==============
-  void _startSpeedTracking() {
-    _positionSubscription =
-        Geolocator.getPositionStream(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.best,
-          ),
-        ).listen((position) {
-          if (!mounted) return;
-          final speedMps = position.speed;
-          final convertedSpeed = _desiredSpeedOutput == "mph"
-              ? speedMps * 2.237
-              : speedMps * 3.6;
-          setState(() {
-            _bikeSpeed = convertedSpeed;
-          });
-        });
+    ref.read(gpsProvider.notifier).startTracking();
   }
 
   // ==============
@@ -138,6 +114,12 @@ class _RideRecordPageState extends ConsumerState<RideRecordPage> {
     });
   }
 
+  @override
+  void dispose() {
+    ref.read(gpsProvider.notifier).stopTracking();
+    super.dispose();
+  }
+
   // ==============
   // ACTUAL WIDGET
   // ==============
@@ -145,18 +127,14 @@ class _RideRecordPageState extends ConsumerState<RideRecordPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final gps = ref.watch(gpsProvider);
+
     final ble = ref.watch(bleProvider);
     double? lean = ble.leanAngle;
-    double? gLat = ble.gLat;
-    double? gLong = ble.gLong;
+    double? bikeSpeed = gps.speed;
 
-    if (_isRecording && lean != null && gLat != null && gLong != null) {
-      final RideDataPoint data = RideDataPoint(
-        angle: lean,
-        speed: _bikeSpeed,
-        gForceLat: gLat,
-        gForceLong: gLong,
-      );
+    if (_isRecording && lean != null) {
+      final RideDataPoint data = RideDataPoint(angle: lean, speed: bikeSpeed);
       _newRide!.addDataPoint(data);
     }
 
@@ -173,14 +151,25 @@ class _RideRecordPageState extends ConsumerState<RideRecordPage> {
           child: ListView(
             children: [
               SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              Text("units for speed:"),
+              ElevatedButton(
+                onPressed: () {
+                  _isDesiredSpeedOutputMPH
+                      ? ref.read(gpsProvider.notifier).switchUnit('kph')
+                      : ref.read(gpsProvider.notifier).switchUnit('mph');
+                  _isDesiredSpeedOutputMPH = !_isDesiredSpeedOutputMPH;
+                },
+                child: _isDesiredSpeedOutputMPH ? Text('KPH') : Text("MPH"),
+              ),
+              ElevatedButton.icon(
+                icon: Icon(_isRecording ? Icons.save : Icons.timer),
+                onPressed: _isRecording ? _stopRecording : _startRecording,
+                label: Text(_isRecording ? 'save' : 'record'),
+              ),
+              Column(
                 children: [
-                  ElevatedButton.icon(
-                    icon: Icon(_isRecording ? Icons.save : Icons.timer),
-                    onPressed: _isRecording ? _stopRecording : _startRecording,
-                    label: Text(_isRecording ? 'save' : 'record'),
-                  ),
+                  if (_isRecording) Text("current angle: $lean"),
+                  if (_isRecording) Text("current speed: $bikeSpeed"),
                 ],
               ),
             ],

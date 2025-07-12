@@ -1,13 +1,29 @@
+import 'package:active_gauges/models/ride_models.dart';
+import 'package:active_gauges/utils/chart_utils.dart';
+import 'package:active_gauges/widgets/ride_details_chart.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:active_gauges/providers/ride_provider.dart';
 import 'package:active_gauges/themes/shared_decorations.dart';
 
-class RideDetailsPage extends StatelessWidget {
-  const RideDetailsPage({super.key});
+class RideDetailsPage extends ConsumerStatefulWidget {
+  const RideDetailsPage({super.key, required this.rideIdx});
+
+  final int rideIdx;
+
+  @override
+  ConsumerState<RideDetailsPage> createState() => _RideDetailsPageState();
+}
+
+class _RideDetailsPageState extends ConsumerState<RideDetailsPage> {
+  SingleRide? ride;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    ride = ref.watch(rideListProvider)[widget.rideIdx];
 
     return Container(
       decoration: appGradientBackground(isDark: isDark),
@@ -15,9 +31,31 @@ class RideDetailsPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Color.fromARGB(80, 111, 111, 111),
-          title: Text("RIDE TITLE HERE"),
+          title: Text(ride!.title),
         ),
-        body: Text("comming soon..."),
+        body: ListView(
+          children: [
+            Text(
+              "ride date: ${DateFormat.yMMMMd().format(ride!.date).toLowerCase()}",
+            ),
+            RideDetailsChart(rideIdx: widget.rideIdx),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "speed",
+                  style: TextStyle(fontSize: 28, color: linePrimaryColor),
+                ),
+                Text(" - ", style: TextStyle(fontSize: 28)),
+                Text(
+                  "angle",
+                  style: TextStyle(fontSize: 28, color: lineSecondaryColor),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
