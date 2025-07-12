@@ -10,7 +10,7 @@ class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   void _changePage(BuildContext context, Widget page) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => page));
+    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
   }
 
   @override
